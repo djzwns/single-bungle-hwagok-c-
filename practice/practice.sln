@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lotto", "lotto\lotto.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Date", "Date\Date.csproj", "{AC008E6E-FF67-4DE5-A09F-725EF9A7E273}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormEvent", "FormEvent\FormEvent.csproj", "{4DECE88C-7362-412D-898D-D52C5A3625A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{AC008E6E-FF67-4DE5-A09F-725EF9A7E273}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC008E6E-FF67-4DE5-A09F-725EF9A7E273}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC008E6E-FF67-4DE5-A09F-725EF9A7E273}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DECE88C-7362-412D-898D-D52C5A3625A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DECE88C-7362-412D-898D-D52C5A3625A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DECE88C-7362-412D-898D-D52C5A3625A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DECE88C-7362-412D-898D-D52C5A3625A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
