@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "baseballgame", "baseballgam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testClass", "testClass\testClass.csproj", "{7C9A7C68-5180-4F14-8290-A6D2E341C1FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lotto", "lotto\lotto.csproj", "{8D57A19B-6E22-4930-B726-B1EF06F73664}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{7C9A7C68-5180-4F14-8290-A6D2E341C1FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C9A7C68-5180-4F14-8290-A6D2E341C1FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C9A7C68-5180-4F14-8290-A6D2E341C1FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D57A19B-6E22-4930-B726-B1EF06F73664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D57A19B-6E22-4930-B726-B1EF06F73664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D57A19B-6E22-4930-B726-B1EF06F73664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D57A19B-6E22-4930-B726-B1EF06F73664}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
