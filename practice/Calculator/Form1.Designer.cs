@@ -45,6 +45,7 @@ namespace Calculator
             this.buttonMul = new System.Windows.Forms.Button();
             this.buttonDiv = new System.Windows.Forms.Button();
             this.buttonResult = new System.Windows.Forms.Button();
+            this.buttonClear = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // tbResult
@@ -214,7 +215,7 @@ namespace Calculator
             // buttonResult
             // 
             this.buttonResult.Font = new System.Drawing.Font("굴림", 12F);
-            this.buttonResult.Location = new System.Drawing.Point(178, 248);
+            this.buttonResult.Location = new System.Drawing.Point(310, 182);
             this.buttonResult.Name = "buttonResult";
             this.buttonResult.Size = new System.Drawing.Size(60, 60);
             this.buttonResult.TabIndex = 1;
@@ -222,11 +223,23 @@ namespace Calculator
             this.buttonResult.UseVisualStyleBackColor = true;
             this.buttonResult.Click += new System.EventHandler(this.buttonResult_Click);
             // 
+            // buttonClear
+            // 
+            this.buttonClear.Font = new System.Drawing.Font("굴림", 12F);
+            this.buttonClear.Location = new System.Drawing.Point(310, 248);
+            this.buttonClear.Name = "buttonClear";
+            this.buttonClear.Size = new System.Drawing.Size(60, 60);
+            this.buttonClear.TabIndex = 1;
+            this.buttonClear.Text = "C";
+            this.buttonClear.UseVisualStyleBackColor = true;
+            this.buttonClear.Click += new System.EventHandler(this.buttonClear_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(314, 321);
+            this.ClientSize = new System.Drawing.Size(385, 321);
+            this.Controls.Add(this.buttonClear);
             this.Controls.Add(this.buttonResult);
             this.Controls.Add(this.buttonDiv);
             this.Controls.Add(this.buttonMul);
@@ -269,6 +282,7 @@ namespace Calculator
         private System.Windows.Forms.Button buttonMul;
         private System.Windows.Forms.Button buttonDiv;
         private System.Windows.Forms.Button buttonResult;
+        private System.Windows.Forms.Button buttonClear;
     }
 }
 

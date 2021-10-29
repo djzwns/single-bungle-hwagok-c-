@@ -36,9 +36,14 @@ namespace Calculator
                     {
                         if (lastOpertype != OperType.NONE)
                             resultString = "";
-                        if (!(resultString == "" && s == "0"))
-                            resultString += s;
-                        tbResult.Text = resultString;
+
+                        resultString += s;
+
+                        string restr = resultString;
+                        if (resultString[0] == '0' && resultString.Length > 1)
+                            restr = resultString.TrimStart('0');
+
+                        tbResult.Text = restr;
                     }
                     break;
 
@@ -125,6 +130,15 @@ namespace Calculator
         private void Form1_Load(object sender, EventArgs e)
         {
             tbResult.Text = "0";
+        }
+
+        private void buttonClear_Click(object sender, EventArgs e)
+        {
+            tbResult.Text = "0";
+            isOper = false;
+            lastOpertype = OperType.NONE;
+            opertype = OperType.NONE;
+            resultString = "";
         }
     }
 }
