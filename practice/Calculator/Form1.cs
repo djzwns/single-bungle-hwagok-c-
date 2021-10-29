@@ -22,8 +22,6 @@ namespace Calculator
         private OperType lastOpertype = OperType.NONE;
         private float result = 0;
         private string resultString = "";
-        private float left = 0;
-        private float right = 0;
 
         public Form1()
         {
