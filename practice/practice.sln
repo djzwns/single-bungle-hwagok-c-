@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleDataManager", "Simple
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScoreData", "ScoreData\ScoreData.csproj", "{AE72F5B4-B5C6-489E-9F4D-BF382C061E5E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "raspberry_led", "raspberry_led\raspberry_led.csproj", "{607CD85A-F4CA-4C20-A299-0688D9630D3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{AE72F5B4-B5C6-489E-9F4D-BF382C061E5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AE72F5B4-B5C6-489E-9F4D-BF382C061E5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AE72F5B4-B5C6-489E-9F4D-BF382C061E5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{607CD85A-F4CA-4C20-A299-0688D9630D3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{607CD85A-F4CA-4C20-A299-0688D9630D3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{607CD85A-F4CA-4C20-A299-0688D9630D3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{607CD85A-F4CA-4C20-A299-0688D9630D3D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
