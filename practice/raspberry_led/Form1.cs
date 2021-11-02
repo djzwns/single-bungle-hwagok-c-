@@ -30,10 +30,11 @@ namespace raspberry_led
         private void SerialDataGet(object sender, EventArgs e)
         {
             int bufferCount = serialDevice.BytesToRead;
-            Console.WriteLine($"buffer count : {bufferCount}");
+            Console.WriteLine($"buffer count: {bufferCount}");
             for (int i = 0; i < bufferCount; ++i)
             {
-                if (ReceiveDataPacket((byte)serialDevice.ReadByte()))
+                byte data = (byte)serialDevice.ReadByte();
+                if (ReceiveDataPacket(data))
                 {
                     // checksum
                     if (Checksum(rxBuf))
@@ -45,7 +46,14 @@ namespace raspberry_led
 
         private bool Checksum(byte[] rxBuf)
         {
-            return rxBuf[0] == 0x5b && rxBuf[rxLen - 1] == 0x5d;
+            int size = 0;
+            for (int i = 2; i < rxLen - 2; ++i)
+                size += rxBuf[i] - '0';
+
+            Console.WriteLine($"checksum size: {size}");
+            bool check1 = (rxBuf[0] == '[') && (rxBuf[rxLen - 1] == ']');
+            bool check2 = (rxBuf[1] == '0') && ((rxBuf[rxLen - 2] - '0') == size);
+            return check1 && check2;
         }
 
         private void DeviceProcess()
@@ -54,24 +62,30 @@ namespace raspberry_led
             List<byte> cmd = new List<byte>();
 
             // led 동작 코드
-            for (int i = 1; i < rxLen - 1; ++i)
+            for (int i = 2; i < rxLen - 2; ++i)
             {
-                if (rxBuf[i] != 0x2c)
+                if (rxBuf[i] != (byte)',')
                 {
                     cmd.Add(rxBuf[i]);
-                    
-                    Console.Write(rxBuf[i]);
                 }
             }
-            Console.WriteLine("");
 
-            btnLED1.Text = cmd[0] == (byte)'1' ? "LED1 OFF" : "LED1 ON";
-            btnLED2.Text = cmd[1] == (byte)'1' ? "LED2 OFF" : "LED2 ON";
-            btnLED3.Text = cmd[2] == (byte)'1' ? "LED3 OFF" : "LED3 ON";
+            if (cmd[3] == (byte)'1')
+            {
+                btnSw1.Text = btnSw1.Text == "SW1 ON" ? "SW1 OFF" : "SW1 ON";
+            }
+            else if (cmd[4] == (byte)'1')
+            {
+                btnSw2.Text = btnSw2.Text == "SW2 ON" ? "SW2 OFF" : "SW2 ON";
+            }
+            else
+            {
+                btnLED1.Text = cmd[0] == (byte)'1' ? "LED1 OFF" : "LED1 ON";
+                btnLED2.Text = cmd[1] == (byte)'1' ? "LED2 OFF" : "LED2 ON";
+                btnLED3.Text = cmd[2] == (byte)'1' ? "LED3 OFF" : "LED3 ON";
+            }
             //btnSw1.Text = cmd[3] == (byte)'1' ? "SW1 OFF" : "SW1 ON";
             //btnSw2.Text = cmd[4] == (byte)'1' ? "SW2 OFF" : "SW2 ON";
-
-            //Console.WriteLine($"message sum: {sum}");
 
             // 활용 한 데이터 초기화
             Array.Clear(rxBuf, 0, rxLen);
@@ -116,6 +130,9 @@ namespace raspberry_led
 
             Console.WriteLine($"data send: {tbCommand.Text}");
             serialDevice.Write(tbCommand.Text);
+            tbCommand.Text = "[]";
+            tbCommand.Focus();
+            tbCommand.Select(1, 0);
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -140,10 +157,11 @@ namespace raspberry_led
 
             if (e.KeyCode == Keys.Enter)
             {
+                Console.WriteLine($"data send: {tbCommand.Text}");
                 serialDevice.Write(tbCommand.Text);
-                tbCommand.Text = "[ ]";
+                tbCommand.Text = "[]";
                 tbCommand.Focus();
-                tbCommand.Select(1, 1);
+                tbCommand.Select(1, 0);
             }
         }
     }

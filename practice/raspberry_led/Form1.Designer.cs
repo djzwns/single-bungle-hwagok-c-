@@ -71,20 +71,20 @@ namespace raspberry_led
             // 
             // btnSw1
             // 
-            this.btnSw1.Location = new System.Drawing.Point(106, 197);
+            this.btnSw1.Location = new System.Drawing.Point(71, 197);
             this.btnSw1.Name = "btnSw1";
-            this.btnSw1.Size = new System.Drawing.Size(75, 23);
+            this.btnSw1.Size = new System.Drawing.Size(110, 23);
             this.btnSw1.TabIndex = 1;
-            this.btnSw1.Text = "switch 1";
+            this.btnSw1.Text = "SW1 OFF";
             this.btnSw1.UseVisualStyleBackColor = true;
             // 
             // btnSw2
             // 
             this.btnSw2.Location = new System.Drawing.Point(236, 197);
             this.btnSw2.Name = "btnSw2";
-            this.btnSw2.Size = new System.Drawing.Size(75, 23);
+            this.btnSw2.Size = new System.Drawing.Size(111, 23);
             this.btnSw2.TabIndex = 1;
-            this.btnSw2.Text = "switch 2";
+            this.btnSw2.Text = "SW2 OFF";
             this.btnSw2.UseVisualStyleBackColor = true;
             // 
             // tbCommand
