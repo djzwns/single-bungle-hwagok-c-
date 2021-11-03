@@ -18,6 +18,8 @@ namespace Challenge_monitoring
         private int rxLen = 0;
         private Regex regex = new Regex(@"([^\[\], ])+");
         private List<string> messageSubs = new List<string>();
+        private List<Label> controlLabels = new List<Label>();
+        private List<PictureBox> controlImages = new List<PictureBox>();
 
         public Form1()
         {
@@ -54,6 +56,7 @@ namespace Challenge_monitoring
             messageSubs.Clear();
 
             string msg = Encoding.Default.GetString(buf, 0, rxLen);
+            lbRecvPacket.Text = msg;
             MatchCollection mc = regex.Matches(msg);
             foreach (Match m in mc)
             {
@@ -77,27 +80,27 @@ namespace Challenge_monitoring
 
         private void DeviceProcess()
         {
-            bool dev1 = messageSubs[1] == "1" ? true : false;
-            bool dev2 = messageSubs[2] == "1" ? true : false;
+            string timestemp = DateTime.Now.ToString("mm:ss");
 
-            //if (cmd[3] == (byte)'1')
-            //{
-            //    btnSw1.Text = btnSw1.Text == "SW1 ON" ? "SW1 OFF" : "SW1 ON";
-            //}
-            //else if (cmd[4] == (byte)'1')
-            //{
-            //    btnSw2.Text = btnSw2.Text == "SW2 ON" ? "SW2 OFF" : "SW2 ON";
-            //}
-            //else
-            //{
-            //    btnLED1.Text = cmd[0] == (byte)'1' ? "LED1 OFF" : "LED1 ON";
-            //    btnLED2.Text = cmd[1] == (byte)'1' ? "LED2 OFF" : "LED2 ON";
-            //    btnLED3.Text = cmd[2] == (byte)'1' ? "LED3 OFF" : "LED3 ON";
-            //}
-            //btnSw1.Text = cmd[3] == (byte)'1' ? "SW1 OFF" : "SW1 ON";
-            //btnSw2.Text = cmd[4] == (byte)'1' ? "SW2 OFF" : "SW2 ON";
+            // messageSubs[0] == start data
+            float temp = Convert.ToSingle(messageSubs[6]);
+            float humi = Convert.ToSingle(messageSubs[7]);
 
-            // 활용 한 데이터 초기화
+            chartTH.Series["Temperature"].Points.AddXY(timestemp, temp);
+            chartTH.Series["Humidity"].Points.AddXY(timestemp, humi);
+            if (chartTH.Series[0].Points.Count >= 50)
+            {
+                chartTH.Series["Temperature"].Points.RemoveAt(0);
+                chartTH.Series["Humidity"].Points.RemoveAt(0);
+            }
+
+            for (int i = 0; i < 5; ++i)
+            {
+                bool enabled = messageSubs[i + 1] == "1";
+                controlLabels[i].Text = enabled ? "ON" : "OFF";
+                controlLabels[i].ForeColor = enabled ? Color.DarkGreen : Color.Red;
+                controlImages[i].Image = imageList.Images[Convert.ToInt32(enabled)];
+            }
         }
 
         private bool ReceiveDataPacket(byte data)
@@ -126,6 +129,18 @@ namespace Challenge_monitoring
             serialDevice.StopBits = StopBits.One;
             serialDevice.Parity = Parity.None;
             cbPort.DataSource = SerialPort.GetPortNames();
+
+            controlLabels.Add(lbDev1Stats);
+            controlLabels.Add(lbDev2Stats);
+            controlLabels.Add(lbDev3Stats);
+            controlLabels.Add(lbSens1Stats);
+            controlLabels.Add(lbSens2Stats);
+
+            controlImages.Add(pbDev1);
+            controlImages.Add(pbDev2);
+            controlImages.Add(pbDev3);
+            controlImages.Add(pbSensor1);
+            controlImages.Add(pbSensor2);
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -150,6 +165,30 @@ namespace Challenge_monitoring
                     MessageBox.Show("serial open error");
                 }
             }
+        }
+
+        private void lbDevice1_Click(object sender, EventArgs e)
+        {
+            if (serialDevice.IsOpen == false)
+                return;
+
+            serialDevice.Write("[1,0]");
+        }
+
+        private void lbDevice2_Click(object sender, EventArgs e)
+        {
+            if (serialDevice.IsOpen == false)
+                return;
+
+            serialDevice.Write("[1,1]");
+        }
+
+        private void lbDevice3_Click(object sender, EventArgs e)
+        {
+            if (serialDevice.IsOpen == false)
+                return;
+
+            serialDevice.Write("[1,2]");
         }
     }
 }
