@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -17,6 +19,13 @@ namespace factoryform
         private bool dbConnectionResult = false;
         private string tempProductName;
 
+        private byte[] rxBuf = new byte[255];
+        private int rxLen = 0;
+        private Regex regex = new Regex(@"([^\[\], ])+");
+        private List<string> messageSubs = new List<string>();
+        private List<Label> controlLabels = new List<Label>();
+        private List<PictureBox> controlImages = new List<PictureBox>();
+
         public Form1()
         {
             InitializeComponent();
@@ -27,6 +36,8 @@ namespace factoryform
             else
                 MessageBox.Show("DB open failed");
             DBClose();
+
+            serialDevice.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(SerialPortDataReceived);
         }
 
         private bool DBOpen()
@@ -114,10 +125,143 @@ namespace factoryform
             return result;
         }
 
+        private void SerialPortDataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            Invoke(new EventHandler(SerialDataGet));
+        }
+
+        private void SerialDataGet(object sender, EventArgs e)
+        {
+            if (serialDevice.IsOpen == false)
+                return;
+
+            int bufferCount = serialDevice.BytesToRead;
+            for (int i = 0; i < bufferCount; ++i)
+            {
+                byte data = (byte)serialDevice.ReadByte();
+                if (ReceiveDataPacket(data))
+                {
+                    // checksum
+                    if (Checksum(rxBuf))
+                        DeviceProcess();
+
+                }
+            }
+        }
+
+        private bool Checksum(byte[] buf)
+        {
+            messageSubs.Clear();
+
+            string msg = Encoding.Default.GetString(buf, 0, rxLen);
+            lbRecvPacket.Text = msg;
+            MatchCollection mc = regex.Matches(msg);
+            foreach (Match m in mc)
+            {
+                Console.WriteLine($"{m.Index}:{m.Value}");
+                messageSubs.Add(m.Value);
+            }
+
+            Array.Clear(rxBuf, 0, rxLen);
+            rxLen = 0;
+
+            // 들어온 값이 8이 아니면 잘못된 패킷
+            if (messageSubs.Count != 8)
+                return false;
+
+            // 첫 데이터가 0이 아니면 잘못된 패킷
+            if (messageSubs[0] != "0")
+                return false;
+
+            return true;
+        }
+
+        private void DeviceProcess()
+        {
+            string timestemp = DateTime.Now.ToString("mm:ss");
+
+            // messageSubs[0] == start data
+            float temp = Convert.ToSingle(messageSubs[6]);
+            float humi = Convert.ToSingle(messageSubs[7]);
+
+            chartTH.Series["Temperature"].Points.AddXY(timestemp, temp);
+            chartTH.Series["Humidity"].Points.AddXY(timestemp, humi);
+            if (chartTH.Series[0].Points.Count >= 50)
+            {
+                chartTH.Series["Temperature"].Points.RemoveAt(0);
+                chartTH.Series["Humidity"].Points.RemoveAt(0);
+            }
+
+            string strSql = "";
+            for (int i = 0; i < 5; ++i)
+            {
+                bool enabled = messageSubs[i + 1] == "1";
+                bool changed = (enabled && controlLabels[i].Text == "OFF") || (enabled == false && controlLabels[i].Text == "ON") ? true : false;
+                controlLabels[i].Text = enabled ? "ON" : "OFF";
+                controlLabels[i].ForeColor = enabled ? Color.DarkGreen : Color.Red;
+                controlImages[i].Image = imageList.Images[Convert.ToInt32(enabled)];
+
+
+                // sql insert
+                if (changed)
+                {
+                    if (enabled)
+                    {
+                        strSql = $"insert into deviceworkingtb values('Line1'" +
+                            $",'Device{i + 1}','{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}','','{enabled}')";
+                    }
+                    else
+                    {
+                        strSql = $"update deviceworkingtb set EndTime='{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' where DeviceName='Device{i + 1}'";
+                    }
+                    Sql(strSql);
+                }
+            }
+            strSql = "select * from deviceworkingtb";
+            SqlSelect(strSql, dataGV_work);
+        }
+
+        private bool ReceiveDataPacket(byte data)
+        {
+            switch (rxLen)
+            {
+                case 0:
+                    if (data == 0x5b) // 91 [
+                    {
+                        rxBuf[rxLen++] = data;
+                    }
+                    break;
+
+                default:
+                    rxBuf[rxLen++] = data;
+                    if (data == 0x5d) // 93 ]
+                        return true;
+                    break;
+            }
+            return false;
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             tbProductNo.Focus();
             tbProductNo.Select(0, tbProductNo.Text.Length);
+
+            serialDevice.DataBits = 8;
+            serialDevice.StopBits = StopBits.One;
+            serialDevice.Parity = Parity.None;
+            cbPort.DataSource = SerialPort.GetPortNames();
+
+            controlLabels.Add(lbDev1Stats);
+            controlLabels.Add(lbDev2Stats);
+            controlLabels.Add(lbDev3Stats);
+            controlLabels.Add(lbSens1Stats);
+            controlLabels.Add(lbSens2Stats);
+
+            controlImages.Add(pbDev1);
+            controlImages.Add(pbDev2);
+            controlImages.Add(pbDev3);
+            controlImages.Add(pbSensor1);
+            controlImages.Add(pbSensor2);
         }
 
         private void DBConnection(string ip, string db_name, string userid, string pw)
@@ -289,6 +433,8 @@ namespace factoryform
             sql = $"update inventorytb set Ea={ea} where ProductNo='{tbProductNo_in.Text}'";
             Sql(sql);
             SqlSelect("select * from inventorytb", dataGV_in_list);
+            SqlSelect("select * from inventorytb", dataGV);
+            SqlSelect("select * from inventorytb", dataGV_out_list);
         }
 
         private void btnOutput_Click(object sender, EventArgs e)
@@ -324,6 +470,74 @@ namespace factoryform
             sql = $"update inventorytb set Ea={ea} where ProductNo='{tbProductNo_out.Text}'";
             Sql(sql);
             SqlSelect("select * from inventorytb", dataGV_out_list);
+            SqlSelect("select * from inventorytb", dataGV);
+            SqlSelect("select * from inventorytb", dataGV_in_list);
+        }
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch(tabControl1.SelectedTab.Text)
+            {
+                case "가동시간":
+
+                    SqlSelect("select * from deviceworkingtb", dataGV_work);
+                    break;
+            }
+        }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            if (serialDevice.IsOpen)
+            {
+                try
+                {
+                    serialDevice.Close();
+                    btnStart.Text = "실행하기";
+                } 
+                catch (Exception err)
+                {
+                    MessageBox.Show(err.Message);
+                }
+            }
+            else
+            {
+                serialDevice.PortName = cbPort.Text;
+                serialDevice.BaudRate = Convert.ToInt32(cbBaud.Text);
+
+                try
+                {
+                    serialDevice.Open();
+                    btnStart.Text = "종료하기";
+                }
+                catch
+                {
+                    MessageBox.Show("serial open error");
+                }
+            }
+        }
+
+        private void lbDevice1_Click(object sender, EventArgs e)
+        {
+            if (serialDevice.IsOpen == false)
+                return;
+
+            serialDevice.Write("[1,0]");
+        }
+
+        private void lbDevice2_Click(object sender, EventArgs e)
+        {
+            if (serialDevice.IsOpen == false)
+                return;
+
+            serialDevice.Write("[1,1]");
+        }
+
+        private void lbDevice3_Click(object sender, EventArgs e)
+        {
+            if (serialDevice.IsOpen == false)
+                return;
+
+            serialDevice.Write("[1,2]");
         }
     }
 }
