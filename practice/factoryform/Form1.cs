@@ -73,6 +73,38 @@ namespace factoryform
             }
         }
 
+        private void InitChart()
+        {
+            DBOpen();
+            try
+            {
+                chartSensor.Series[0].Points.Clear();
+                chartSensor.Series[1].Points.Clear();
+
+                string sql = $"select * from errorstatisticstb";
+                MySqlCommand cmd = new MySqlCommand(sql, connection);
+                MySqlDataReader reader =  cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    string date = reader["DateTime"].ToString();
+                    string sensor = reader["SensorName"].ToString();
+                    int error = Convert.ToInt32(reader["ErrorCount"]);
+                    chartSensor.Series[sensor].Points.AddXY(date, error);
+                    if (chartSensor.Series[0].Points.Count >= 5 && chartSensor.Series[1].Points.Count >= 5)
+                    {
+                        chartSensor.Series[0].Points.RemoveAt(0);
+                        chartSensor.Series[1].Points.RemoveAt(0);
+                    }
+                }
+                reader.Close();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            DBClose();
+        }
+
         private bool Sql(string strSql)
         {
             DBOpen();
@@ -85,6 +117,7 @@ namespace factoryform
             }
             catch (Exception ex)
             {
+                MessageBox.Show(ex.Message);
                 DBClose();
                 return false;
             }
@@ -203,22 +236,49 @@ namespace factoryform
 
 
                 // sql insert
-                if (changed)
+                if (changed && i < 3)
                 {
                     if (enabled)
                     {
-                        strSql = $"insert into deviceworkingtb values('Line1'" +
-                            $",'Device{i + 1}','{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}','','{enabled}')";
+                        strSql = $"insert into deviceworkingtb (LineNo,DeviceName,StartTime,Status)" +
+                            $"select 'Line1','Device{i + 1}','{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}','True' from dual where not exists(select Status,DeviceName from deviceworkingtb where Status='True' and DeviceName='Device{i + 1}')";
+                        //strSql = $"insert into deviceworkingtb (LineNo,DeviceName,StartTime,Status) values('Line1'" +
+                        //    $",'Device{i + 1}','{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}','{enabled}')";
                     }
                     else
                     {
-                        strSql = $"update deviceworkingtb set EndTime='{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}' where DeviceName='Device{i + 1}'";
+                        strSql = $"update deviceworkingtb set EndTime='{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}', Status='{enabled}' where DeviceName='Device{i + 1}' and Status='True'";
                     }
                     Sql(strSql);
+                    strSql = "select * from deviceworkingtb";
+                    SqlSelect(strSql, dataGV_work);
+                    strSql = "select DeviceName,sum(timestampdiff(second,StartTime,EndTime)) as '총 가동시간(s)' from factorydb.deviceworkingtb group by DeviceName";
+                    SqlSelect(strSql, dataGV_sumtime);
+                }
+                else if (changed && 3 <= i && i < 5)
+                {
+                    if (enabled)
+                    {
+                        DBOpen();
+                        string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+                        string sensor = $"Sensor{i - 2}";
+                        string str = $"select ErrorCount from errorstatisticstb where DateTime='{date}' and SensorName='{sensor}'";
+                        MySqlCommand cmd = new MySqlCommand(str, connection);
+                        if (cmd.ExecuteScalar() == null)
+                        {
+                            //strSql = $"insert into errorstatisticstb select '{date}', '{sensor}', 1 from dual where not exists(select DateTime from errorstatisticstb where DateTime='{date}' and SensorName='{sensor}')";
+                            strSql = $"insert into errorstatisticstb values('{date}','{sensor}',1)";
+                        }
+                        else
+                        {
+                            strSql = $"update errorstatisticstb set ErrorCount = ErrorCount + 1 where DateTime='{date}' and SensorName='{sensor}'";
+                        }
+                        DBClose();
+                        Sql(strSql);
+                        InitChart();
+                    }
                 }
             }
-            strSql = "select * from deviceworkingtb";
-            SqlSelect(strSql, dataGV_work);
         }
 
         private bool ReceiveDataPacket(byte data)
@@ -262,6 +322,16 @@ namespace factoryform
             controlImages.Add(pbDev3);
             controlImages.Add(pbSensor1);
             controlImages.Add(pbSensor2);
+
+            string timeFormat = "yyyy-MM-dd";
+            dtp1.CustomFormat = timeFormat;
+            dtp2.CustomFormat = timeFormat;
+
+            string startTime = DateTime.Now.ToString(timeFormat);
+            string endTime = DateTime.Now.AddDays(6).ToString(timeFormat);
+
+            dtp1.Value = DateTime.ParseExact(startTime, timeFormat, null);
+            dtp2.Value = DateTime.ParseExact(endTime, timeFormat, null);
         }
 
         private void DBConnection(string ip, string db_name, string userid, string pw)
@@ -481,6 +551,11 @@ namespace factoryform
                 case "가동시간":
 
                     SqlSelect("select * from deviceworkingtb", dataGV_work);
+                    SqlSelect("select DeviceName,sum(timestampdiff(second,StartTime,EndTime)) as '총 가동시간(s)' from factorydb.deviceworkingtb group by DeviceName", dataGV_sumtime);
+                    break;
+
+                case "오류통계":
+                    InitChart();
                     break;
             }
         }
@@ -538,6 +613,29 @@ namespace factoryform
                 return;
 
             serialDevice.Write("[1,2]");
+        }
+
+        private void dtp1_ValueChanged(object sender, EventArgs e)
+        {
+            if ((dtp1.Value - dtp2.Value).TotalSeconds >= 0)
+            {
+                dtp2.Value = dtp1.Value.AddDays(6);
+            }
+        }
+
+        private void dtp2_ValueChanged(object sender, EventArgs e)
+        {
+            Console.WriteLine((dtp1.Value - dtp2.Value).TotalSeconds);
+            if ((dtp1.Value - dtp2.Value).TotalSeconds >= 0)
+            {
+                dtp1.Value = dtp2.Value.AddDays(-6);
+            }
+        }
+
+        private void btnSumTime_Click(object sender, EventArgs e)
+        {
+            string str = $"select DeviceName,sum(timestampdiff(second,StartTime,EndTime)) as '총 가동시간(s)' from factorydb.deviceworkingtb where date_format(EndTime, '%Y-%m-%d') between '{dtp1.Value.ToString("yyyy-MM-dd")}' and '{dtp2.Value.ToString("yyyy-MM-dd")}' group by DeviceName";
+            SqlSelect(str, dataGV_sumtime);
         }
     }
 }

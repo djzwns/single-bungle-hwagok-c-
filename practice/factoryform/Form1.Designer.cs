@@ -35,6 +35,10 @@ namespace factoryform
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.gbProductList = new System.Windows.Forms.GroupBox();
@@ -86,14 +90,7 @@ namespace factoryform
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.dataGV_work = new System.Windows.Forms.DataGridView();
             this.tabPage5 = new System.Windows.Forms.TabPage();
-            this.btnStart = new System.Windows.Forms.Button();
-            this.cbLine = new System.Windows.Forms.ComboBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.cbBaud = new System.Windows.Forms.ComboBox();
-            this.label13 = new System.Windows.Forms.Label();
-            this.cbPort = new System.Windows.Forms.ComboBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.gbConnect = new System.Windows.Forms.GroupBox();
+            this.chartTH = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.gbControl = new System.Windows.Forms.GroupBox();
             this.pbSensor2 = new System.Windows.Forms.PictureBox();
             this.pbSensor1 = new System.Windows.Forms.PictureBox();
@@ -112,9 +109,23 @@ namespace factoryform
             this.lbDevice3 = new System.Windows.Forms.Label();
             this.lbDevice2 = new System.Windows.Forms.Label();
             this.lbDevice1 = new System.Windows.Forms.Label();
-            this.chartTH = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.gbConnect = new System.Windows.Forms.GroupBox();
+            this.btnStart = new System.Windows.Forms.Button();
+            this.cbLine = new System.Windows.Forms.ComboBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.cbBaud = new System.Windows.Forms.ComboBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.cbPort = new System.Windows.Forms.ComboBox();
+            this.label14 = new System.Windows.Forms.Label();
             this.serialDevice = new System.IO.Ports.SerialPort(this.components);
             this.imageList = new System.Windows.Forms.ImageList(this.components);
+            this.dataGV_sumtime = new System.Windows.Forms.DataGridView();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.chartSensor = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.dtp1 = new System.Windows.Forms.DateTimePicker();
+            this.dtp2 = new System.Windows.Forms.DateTimePicker();
+            this.label15 = new System.Windows.Forms.Label();
+            this.btnSumTime = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.gbProductList.SuspendLayout();
@@ -133,14 +144,17 @@ namespace factoryform
             this.tabPage4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV_work)).BeginInit();
             this.tabPage5.SuspendLayout();
-            this.gbConnect.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartTH)).BeginInit();
             this.gbControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbSensor2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbSensor1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDev3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDev2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDev1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartTH)).BeginInit();
+            this.gbConnect.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGV_sumtime)).BeginInit();
+            this.tabPage6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartSensor)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -148,12 +162,13 @@ namespace factoryform
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage5);
+            this.tabControl1.Controls.Add(this.tabPage4);
+            this.tabControl1.Controls.Add(this.tabPage6);
             this.tabControl1.Location = new System.Drawing.Point(3, 3);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(794, 444);
+            this.tabControl1.Size = new System.Drawing.Size(794, 443);
             this.tabControl1.TabIndex = 1;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
@@ -164,7 +179,7 @@ namespace factoryform
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(786, 415);
+            this.tabPage1.Size = new System.Drawing.Size(786, 414);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "재고관리";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -399,7 +414,7 @@ namespace factoryform
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(786, 415);
+            this.tabPage2.Size = new System.Drawing.Size(786, 414);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "입고관리";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -519,7 +534,7 @@ namespace factoryform
             this.tabPage3.Controls.Add(this.tbProductNoSearch_out);
             this.tabPage3.Location = new System.Drawing.Point(4, 25);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(786, 415);
+            this.tabPage3.Size = new System.Drawing.Size(786, 414);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "출고관리";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -628,10 +643,15 @@ namespace factoryform
             // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.btnSumTime);
+            this.tabPage4.Controls.Add(this.label15);
+            this.tabPage4.Controls.Add(this.dtp2);
+            this.tabPage4.Controls.Add(this.dtp1);
+            this.tabPage4.Controls.Add(this.dataGV_sumtime);
             this.tabPage4.Controls.Add(this.dataGV_work);
             this.tabPage4.Location = new System.Drawing.Point(4, 25);
             this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(786, 415);
+            this.tabPage4.Size = new System.Drawing.Size(786, 414);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "가동시간";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -643,7 +663,7 @@ namespace factoryform
             this.dataGV_work.Name = "dataGV_work";
             this.dataGV_work.RowHeadersWidth = 51;
             this.dataGV_work.RowTemplate.Height = 27;
-            this.dataGV_work.Size = new System.Drawing.Size(780, 409);
+            this.dataGV_work.Size = new System.Drawing.Size(780, 235);
             this.dataGV_work.TabIndex = 0;
             // 
             // tabPage5
@@ -653,94 +673,40 @@ namespace factoryform
             this.tabPage5.Controls.Add(this.gbConnect);
             this.tabPage5.Location = new System.Drawing.Point(4, 25);
             this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Size = new System.Drawing.Size(786, 415);
+            this.tabPage5.Size = new System.Drawing.Size(786, 414);
             this.tabPage5.TabIndex = 4;
             this.tabPage5.Text = "장비관리";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
-            // btnStart
+            // chartTH
             // 
-            this.btnStart.Location = new System.Drawing.Point(671, 24);
-            this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(99, 23);
-            this.btnStart.TabIndex = 6;
-            this.btnStart.Text = "실행하기";
-            this.btnStart.UseVisualStyleBackColor = true;
-            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
-            // 
-            // cbLine
-            // 
-            this.cbLine.FormattingEnabled = true;
-            this.cbLine.Items.AddRange(new object[] {
-            "라인1",
-            "라인2",
-            "라인3"});
-            this.cbLine.Location = new System.Drawing.Point(528, 24);
-            this.cbLine.Name = "cbLine";
-            this.cbLine.Size = new System.Drawing.Size(121, 23);
-            this.cbLine.TabIndex = 5;
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(455, 27);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(67, 15);
-            this.label12.TabIndex = 4;
-            this.label12.Text = "라인선택";
-            // 
-            // cbBaud
-            // 
-            this.cbBaud.FormattingEnabled = true;
-            this.cbBaud.Items.AddRange(new object[] {
-            "9600",
-            "115200"});
-            this.cbBaud.Location = new System.Drawing.Point(300, 24);
-            this.cbBaud.Name = "cbBaud";
-            this.cbBaud.Size = new System.Drawing.Size(121, 23);
-            this.cbBaud.TabIndex = 3;
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(227, 27);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(67, 15);
-            this.label13.TabIndex = 2;
-            this.label13.Text = "포트속도";
-            // 
-            // cbPort
-            // 
-            this.cbPort.FormattingEnabled = true;
-            this.cbPort.Location = new System.Drawing.Point(79, 24);
-            this.cbPort.Name = "cbPort";
-            this.cbPort.Size = new System.Drawing.Size(121, 23);
-            this.cbPort.TabIndex = 1;
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(6, 27);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(67, 15);
-            this.label14.TabIndex = 0;
-            this.label14.Text = "포트선택";
-            // 
-            // gbConnect
-            // 
-            this.gbConnect.Controls.Add(this.btnStart);
-            this.gbConnect.Controls.Add(this.cbLine);
-            this.gbConnect.Controls.Add(this.label12);
-            this.gbConnect.Controls.Add(this.cbBaud);
-            this.gbConnect.Controls.Add(this.label13);
-            this.gbConnect.Controls.Add(this.cbPort);
-            this.gbConnect.Controls.Add(this.label14);
-            this.gbConnect.Location = new System.Drawing.Point(3, 3);
-            this.gbConnect.Name = "gbConnect";
-            this.gbConnect.Size = new System.Drawing.Size(776, 63);
-            this.gbConnect.TabIndex = 1;
-            this.gbConnect.TabStop = false;
-            this.gbConnect.Text = "라인 연결";
+            this.chartTH.BackColor = System.Drawing.Color.WhiteSmoke;
+            chartArea1.Name = "ChartArea1";
+            this.chartTH.ChartAreas.Add(chartArea1);
+            this.chartTH.Location = new System.Drawing.Point(392, 72);
+            this.chartTH.Name = "chartTH";
+            series1.BorderWidth = 2;
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Color = System.Drawing.Color.Blue;
+            series1.IsXValueIndexed = true;
+            series1.Name = "Humidity";
+            series1.ShadowOffset = 1;
+            series2.BorderWidth = 2;
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series2.Color = System.Drawing.Color.Red;
+            series2.IsXValueIndexed = true;
+            series2.Name = "Temperature";
+            series2.ShadowOffset = 1;
+            this.chartTH.Series.Add(series1);
+            this.chartTH.Series.Add(series2);
+            this.chartTH.Size = new System.Drawing.Size(387, 338);
+            this.chartTH.TabIndex = 3;
+            this.chartTH.Text = "chart1";
+            title1.Name = "실시간 온습도 그래프";
+            title1.Text = "실시간 온습도 그래프";
+            this.chartTH.Titles.Add(title1);
             // 
             // gbControl
             // 
@@ -964,33 +930,89 @@ namespace factoryform
             this.lbDevice1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.lbDevice1.Click += new System.EventHandler(this.lbDevice1_Click);
             // 
-            // chartTH
+            // gbConnect
             // 
-            this.chartTH.BackColor = System.Drawing.Color.WhiteSmoke;
-            chartArea1.Name = "ChartArea1";
-            this.chartTH.ChartAreas.Add(chartArea1);
-            this.chartTH.Location = new System.Drawing.Point(392, 72);
-            this.chartTH.Name = "chartTH";
-            series1.BorderWidth = 2;
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series1.Color = System.Drawing.Color.Blue;
-            series1.Name = "Humidity";
-            series1.ShadowOffset = 1;
-            series2.BorderWidth = 2;
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series2.Color = System.Drawing.Color.Red;
-            series2.Name = "Temperature";
-            series2.ShadowOffset = 1;
-            this.chartTH.Series.Add(series1);
-            this.chartTH.Series.Add(series2);
-            this.chartTH.Size = new System.Drawing.Size(387, 338);
-            this.chartTH.TabIndex = 3;
-            this.chartTH.Text = "chart1";
-            title1.Name = "실시간 온습도 그래프";
-            title1.Text = "실시간 온습도 그래프";
-            this.chartTH.Titles.Add(title1);
+            this.gbConnect.Controls.Add(this.btnStart);
+            this.gbConnect.Controls.Add(this.cbLine);
+            this.gbConnect.Controls.Add(this.label12);
+            this.gbConnect.Controls.Add(this.cbBaud);
+            this.gbConnect.Controls.Add(this.label13);
+            this.gbConnect.Controls.Add(this.cbPort);
+            this.gbConnect.Controls.Add(this.label14);
+            this.gbConnect.Location = new System.Drawing.Point(3, 3);
+            this.gbConnect.Name = "gbConnect";
+            this.gbConnect.Size = new System.Drawing.Size(776, 63);
+            this.gbConnect.TabIndex = 1;
+            this.gbConnect.TabStop = false;
+            this.gbConnect.Text = "라인 연결";
+            // 
+            // btnStart
+            // 
+            this.btnStart.Location = new System.Drawing.Point(671, 24);
+            this.btnStart.Name = "btnStart";
+            this.btnStart.Size = new System.Drawing.Size(99, 23);
+            this.btnStart.TabIndex = 6;
+            this.btnStart.Text = "실행하기";
+            this.btnStart.UseVisualStyleBackColor = true;
+            this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
+            // 
+            // cbLine
+            // 
+            this.cbLine.FormattingEnabled = true;
+            this.cbLine.Items.AddRange(new object[] {
+            "라인1",
+            "라인2",
+            "라인3"});
+            this.cbLine.Location = new System.Drawing.Point(528, 24);
+            this.cbLine.Name = "cbLine";
+            this.cbLine.Size = new System.Drawing.Size(121, 23);
+            this.cbLine.TabIndex = 5;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(455, 27);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(67, 15);
+            this.label12.TabIndex = 4;
+            this.label12.Text = "라인선택";
+            // 
+            // cbBaud
+            // 
+            this.cbBaud.FormattingEnabled = true;
+            this.cbBaud.Items.AddRange(new object[] {
+            "9600",
+            "115200"});
+            this.cbBaud.Location = new System.Drawing.Point(300, 24);
+            this.cbBaud.Name = "cbBaud";
+            this.cbBaud.Size = new System.Drawing.Size(121, 23);
+            this.cbBaud.TabIndex = 3;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(227, 27);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(67, 15);
+            this.label13.TabIndex = 2;
+            this.label13.Text = "포트속도";
+            // 
+            // cbPort
+            // 
+            this.cbPort.FormattingEnabled = true;
+            this.cbPort.Location = new System.Drawing.Point(79, 24);
+            this.cbPort.Name = "cbPort";
+            this.cbPort.Size = new System.Drawing.Size(121, 23);
+            this.cbPort.TabIndex = 1;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(6, 27);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(67, 15);
+            this.label14.TabIndex = 0;
+            this.label14.Text = "포트선택";
             // 
             // imageList
             // 
@@ -998,6 +1020,87 @@ namespace factoryform
             this.imageList.TransparentColor = System.Drawing.Color.Transparent;
             this.imageList.Images.SetKeyName(0, "device_off.png");
             this.imageList.Images.SetKeyName(1, "device_on.png");
+            // 
+            // dataGV_sumtime
+            // 
+            this.dataGV_sumtime.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGV_sumtime.Location = new System.Drawing.Point(3, 244);
+            this.dataGV_sumtime.Name = "dataGV_sumtime";
+            this.dataGV_sumtime.RowHeadersWidth = 51;
+            this.dataGV_sumtime.RowTemplate.Height = 27;
+            this.dataGV_sumtime.Size = new System.Drawing.Size(353, 166);
+            this.dataGV_sumtime.TabIndex = 2;
+            // 
+            // tabPage6
+            // 
+            this.tabPage6.Controls.Add(this.chartSensor);
+            this.tabPage6.Location = new System.Drawing.Point(4, 25);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Size = new System.Drawing.Size(786, 414);
+            this.tabPage6.TabIndex = 5;
+            this.tabPage6.Text = "오류통계";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // chartSensor
+            // 
+            chartArea2.Name = "ChartArea1";
+            this.chartSensor.ChartAreas.Add(chartArea2);
+            legend1.Name = "Legend1";
+            this.chartSensor.Legends.Add(legend1);
+            this.chartSensor.Location = new System.Drawing.Point(5, 3);
+            this.chartSensor.Name = "chartSensor";
+            series3.ChartArea = "ChartArea1";
+            series3.Color = System.Drawing.Color.Blue;
+            series3.Legend = "Legend1";
+            series3.Name = "Sensor1";
+            series3.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            series4.ChartArea = "ChartArea1";
+            series4.Color = System.Drawing.Color.Yellow;
+            series4.Legend = "Legend1";
+            series4.Name = "Sensor2";
+            series4.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.DateTime;
+            this.chartSensor.Series.Add(series3);
+            this.chartSensor.Series.Add(series4);
+            this.chartSensor.Size = new System.Drawing.Size(776, 407);
+            this.chartSensor.TabIndex = 0;
+            this.chartSensor.Text = "chart1";
+            // 
+            // dtp1
+            // 
+            this.dtp1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dtp1.Location = new System.Drawing.Point(362, 285);
+            this.dtp1.Name = "dtp1";
+            this.dtp1.Size = new System.Drawing.Size(197, 25);
+            this.dtp1.TabIndex = 3;
+            this.dtp1.ValueChanged += new System.EventHandler(this.dtp1_ValueChanged);
+            // 
+            // dtp2
+            // 
+            this.dtp2.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dtp2.Location = new System.Drawing.Point(584, 285);
+            this.dtp2.Name = "dtp2";
+            this.dtp2.Size = new System.Drawing.Size(197, 25);
+            this.dtp2.TabIndex = 4;
+            this.dtp2.ValueChanged += new System.EventHandler(this.dtp2_ValueChanged);
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(562, 292);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(18, 15);
+            this.label15.TabIndex = 5;
+            this.label15.Text = "~";
+            // 
+            // btnSumTime
+            // 
+            this.btnSumTime.Location = new System.Drawing.Point(652, 316);
+            this.btnSumTime.Name = "btnSumTime";
+            this.btnSumTime.Size = new System.Drawing.Size(129, 23);
+            this.btnSumTime.TabIndex = 6;
+            this.btnSumTime.Text = "가동시간 조회";
+            this.btnSumTime.UseVisualStyleBackColor = true;
+            this.btnSumTime.Click += new System.EventHandler(this.btnSumTime_Click);
             // 
             // Form1
             // 
@@ -1028,10 +1131,10 @@ namespace factoryform
             this.groupBox4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGV_out_list)).EndInit();
             this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGV_work)).EndInit();
             this.tabPage5.ResumeLayout(false);
-            this.gbConnect.ResumeLayout(false);
-            this.gbConnect.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartTH)).EndInit();
             this.gbControl.ResumeLayout(false);
             this.gbControl.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbSensor2)).EndInit();
@@ -1039,7 +1142,11 @@ namespace factoryform
             ((System.ComponentModel.ISupportInitialize)(this.pbDev3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDev2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDev1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chartTH)).EndInit();
+            this.gbConnect.ResumeLayout(false);
+            this.gbConnect.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGV_sumtime)).EndInit();
+            this.tabPage6.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chartSensor)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1126,6 +1233,13 @@ namespace factoryform
         private System.Windows.Forms.DataVisualization.Charting.Chart chartTH;
         private System.IO.Ports.SerialPort serialDevice;
         private System.Windows.Forms.ImageList imageList;
+        private System.Windows.Forms.DataGridView dataGV_sumtime;
+        private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartSensor;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.DateTimePicker dtp2;
+        private System.Windows.Forms.DateTimePicker dtp1;
+        private System.Windows.Forms.Button btnSumTime;
     }
 }
 
