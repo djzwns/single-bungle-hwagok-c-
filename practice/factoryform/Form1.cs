@@ -18,6 +18,7 @@ namespace factoryform
         private MySqlConnection connection;
         private bool dbConnectionResult = false;
         private string tempProductName;
+        private string lineNo = "Line1";
 
         private byte[] rxBuf = new byte[255];
         private int rxLen = 0;
@@ -86,11 +87,13 @@ namespace factoryform
                 MySqlDataReader reader =  cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    string date = reader["DateTime"].ToString();
+                    //Console.WriteLine(reader["DateTime"].ToString());
+                    //DateTime date = DateTime.Parse(reader["DateTime"].ToString());
+                    string date = DateTime.Parse(reader["DateTime"].ToString()).ToString("MM-dd HH:mm");
                     string sensor = reader["SensorName"].ToString();
-                    int error = Convert.ToInt32(reader["ErrorCount"]);
-                    chartSensor.Series[sensor].Points.AddXY(date, error);
-                    if (chartSensor.Series[0].Points.Count >= 5 && chartSensor.Series[1].Points.Count >= 5)
+                    int errorCount = Convert.ToInt32(reader["ErrorCount"]);
+                    chartSensor.Series[sensor].Points.AddXY(date, errorCount);
+                    if (chartSensor.Series[0].Points.Count > 5 && chartSensor.Series[1].Points.Count > 5)
                     {
                         chartSensor.Series[0].Points.RemoveAt(0);
                         chartSensor.Series[1].Points.RemoveAt(0);
@@ -214,8 +217,8 @@ namespace factoryform
             string timestemp = DateTime.Now.ToString("mm:ss");
 
             // messageSubs[0] == start data
-            float temp = Convert.ToSingle(messageSubs[6]);
-            float humi = Convert.ToSingle(messageSubs[7]);
+            float humi = Convert.ToSingle(messageSubs[6]);
+            float temp = Convert.ToSingle(messageSubs[7]);
 
             chartTH.Series["Temperature"].Points.AddXY(timestemp, temp);
             chartTH.Series["Humidity"].Points.AddXY(timestemp, humi);
@@ -241,7 +244,7 @@ namespace factoryform
                     if (enabled)
                     {
                         strSql = $"insert into deviceworkingtb (LineNo,DeviceName,StartTime,Status)" +
-                            $"select 'Line1','Device{i + 1}','{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}','True' from dual where not exists(select Status,DeviceName from deviceworkingtb where Status='True' and DeviceName='Device{i + 1}')";
+                            $"select '{lineNo}','Device{i + 1}','{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}','True' from dual where not exists(select Status,DeviceName from deviceworkingtb where Status='True' and DeviceName='Device{i + 1}')";
                         //strSql = $"insert into deviceworkingtb (LineNo,DeviceName,StartTime,Status) values('Line1'" +
                         //    $",'Device{i + 1}','{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}','{enabled}')";
                     }
@@ -259,21 +262,26 @@ namespace factoryform
                 {
                     if (enabled)
                     {
-                        DBOpen();
+
+                        //DBOpen();
                         string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
                         string sensor = $"Sensor{i - 2}";
-                        string str = $"select ErrorCount from errorstatisticstb where DateTime='{date}' and SensorName='{sensor}'";
-                        MySqlCommand cmd = new MySqlCommand(str, connection);
-                        if (cmd.ExecuteScalar() == null)
-                        {
-                            //strSql = $"insert into errorstatisticstb select '{date}', '{sensor}', 1 from dual where not exists(select DateTime from errorstatisticstb where DateTime='{date}' and SensorName='{sensor}')";
-                            strSql = $"insert into errorstatisticstb values('{date}','{sensor}',1)";
-                        }
-                        else
+                        strSql = $"insert into errorstatisticstb (LineNo,DateTime,SensorName,ErrorCount) select '{lineNo}', '{date}', 'Sensor1', 0 from dual where not exists(select DateTime from errorstatisticstb where DateTime='{date}' and SensorName='Sensor1')";
+                        Sql(strSql);
+                        strSql = $"insert into errorstatisticstb (LineNo,DateTime,SensorName,ErrorCount) select '{lineNo}', '{date}', 'Sensor2', 0 from dual where not exists(select DateTime from errorstatisticstb where DateTime='{date}' and SensorName='Sensor2')";
+                        Sql(strSql);
+                        //string str = $"select ErrorCount from errorstatisticstb where DateTime='{date}' and SensorName='{sensor}'";
+                        //MySqlCommand cmd = new MySqlCommand(str, connection);
+                        //if (cmd.ExecuteScalar() == null)
+                        //{
+                        //    //strSql = $"insert into errorstatisticstb values('{date}','{sensor}',1)";
+                        //    //strSql = $"insert into errorstatisticstb (DateTime,SensorName,ErrorCount) values('{date}','Sensor1',0)";
+                        //}
+                        //else
                         {
                             strSql = $"update errorstatisticstb set ErrorCount = ErrorCount + 1 where DateTime='{date}' and SensorName='{sensor}'";
                         }
-                        DBClose();
+                        //DBClose();
                         Sql(strSql);
                         InitChart();
                     }
@@ -326,12 +334,16 @@ namespace factoryform
             string timeFormat = "yyyy-MM-dd";
             dtp1.CustomFormat = timeFormat;
             dtp2.CustomFormat = timeFormat;
+            dtpStartSensor.CustomFormat = timeFormat;
+            dtpEndSensor.CustomFormat = timeFormat;
 
             string startTime = DateTime.Now.ToString(timeFormat);
             string endTime = DateTime.Now.AddDays(6).ToString(timeFormat);
 
             dtp1.Value = DateTime.ParseExact(startTime, timeFormat, null);
             dtp2.Value = DateTime.ParseExact(endTime, timeFormat, null);
+            dtpStartSensor.Value = DateTime.ParseExact(startTime, timeFormat, null);
+            dtpEndSensor.Value = DateTime.ParseExact(endTime, timeFormat, null);
         }
 
         private void DBConnection(string ip, string db_name, string userid, string pw)
@@ -578,6 +590,8 @@ namespace factoryform
             {
                 serialDevice.PortName = cbPort.Text;
                 serialDevice.BaudRate = Convert.ToInt32(cbBaud.Text);
+                gbControl.Text = gbControl.Text.Replace(lineNo, cbLine.Text);
+                lineNo = cbLine.Text;
 
                 try
                 {
@@ -636,6 +650,33 @@ namespace factoryform
         {
             string str = $"select DeviceName,sum(timestampdiff(second,StartTime,EndTime)) as '총 가동시간(s)' from factorydb.deviceworkingtb where date_format(EndTime, '%Y-%m-%d') between '{dtp1.Value.ToString("yyyy-MM-dd")}' and '{dtp2.Value.ToString("yyyy-MM-dd")}' group by DeviceName";
             SqlSelect(str, dataGV_sumtime);
+        }
+
+        private void dtpStartSensor_ValueChanged(object sender, EventArgs e)
+        {
+            if ((dtpStartSensor.Value - dtpEndSensor.Value).TotalSeconds >= 0)
+            {
+                dtpEndSensor.Value = dtpStartSensor.Value.AddDays(6);
+            }
+        }
+
+        private void dtpEndSensor_ValueChanged(object sender, EventArgs e)
+        {
+            if ((dtpStartSensor.Value - dtpEndSensor.Value).TotalSeconds >= 0)
+            {
+                dtpStartSensor.Value = dtpEndSensor.Value.AddDays(-6);
+            }
+        }
+
+        private void btnErrorCount_Click(object sender, EventArgs e)
+        {
+            string str = $"select SensorName,sum(ErrorCount) as '기간 내 오류횟수' from factorydb.errorstatisticstb where date_format(DateTime, '%Y-%m-%d') between '{dtpStartSensor.Value.ToString("yyyy-MM-dd")}' and '{dtpEndSensor.Value.ToString("yyyy-MM-dd")}' group by SensorName";
+            SqlSelect(str, dataGV_error);
+        }
+
+        private void chartSensor_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
